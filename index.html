@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estacionamento de Veículos - Projeto Flash</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-parking"></i> Estacionamento de Veículos</h1>
+            <p class="subtitle">Projeto Flash – Back-end + Front-end + SQLite</p>
+        </header>
+
+        <!-- Estatísticas / Relatórios -->
+        <div class="stats">
+            <div class="stat-card">
+                <i class="fas fa-car"></i>
+                <div>
+                    <span class="stat-number" id="stat-estacionados">0</span>
+                    <span class="stat-label">Estacionados</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-sign-out-alt"></i>
+                <div>
+                    <span class="stat-number" id="stat-saidos">0</span>
+                    <span class="stat-label">Saídas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-dollar-sign"></i>
+                <div>
+                    <span class="stat-number" id="stat-arrecadado">R$ 0,00</span>
+                    <span class="stat-label">Arrecadado</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-square-parking"></i>
+                <div>
+                    <span class="stat-number" id="stat-vagas">0</span>
+                    <span class="stat-label">Vagas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="entrada"><i class="fas fa-plus"></i> Entrada</button>
+            <button class="tab-btn" data-tab="estacionados"><i class="fas fa-car"></i> Estacionados</button>
+            <button class="tab-btn" data-tab="historico"><i class="fas fa-history"></i> Histórico</button>
+            <button class="tab-btn" data-tab="vagas"><i class="fas fa-square-parking"></i> Vagas</button>
+            <button class="tab-btn" data-tab="veiculos"><i class="fas fa-car-side"></i> Veículos</button>
+            <button class="tab-btn" data-tab="clientes"><i class="fas fa-users"></i> Clientes</button>
+        </div>
+
+        <!-- TAB ENTRADA -->
+        <section class="card tab-content" id="tab-entrada">
+            <h2><i class="fas fa-sign-in-alt"></i> Registrar Entrada</h2>
+            <form id="form-entrada">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Placa *</label>
+                        <input type="text" id="placa-entrada" placeholder="ABC-1234" maxlength="8" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Vaga</label>
+                        <select id="tipo-vaga">
+                            <option value="normal">Normal</option>
+                            <option value="preferencial">Preferencial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Cobrança</label>
+                        <select id="tipo-cobranca">
+                            <option value="hora">Por Hora (R$ 5,00)</option>
+                            <option value="diaria">Diária (R$ 40,00)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Registrar Entrada</button>
+            </form>
+            <p class="info">⚠️ O veículo precisa estar cadastrado antes de entrar.</p>
+        </section>
+
+        <!-- TAB ESTACIONADOS -->
+        <section class="card tab-content" id="tab-estacionados" style="display:none;">
+            <h2><i class="fas fa-list"></i> Veículos Estacionados</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Modelo</th>
+                            <th>Cor</th>
+                            <th>Vaga</th>
+                            <th>Data/Hora Entrada</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-estacionados"></tbody>
+                </table>
+            </div>
+            <p class="empty-msg" id="empty-estacionados" style="display:none;">Nenhum veículo estacionado.</p>
+        </section>
+
+        <!-- TAB HISTÓRICO -->
+        <section class="card tab-content" id="tab-historico" style="display:none;">
+            <h2><i class="fas fa-history"></i> Histórico de Saídas</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Modelo</th>
+                            <th>Entrada</th>
+                            <th>Saída</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-historico"></tbody>
+                </table>
+            </div>
+            <p class="empty-msg" id="empty-historico" style="display:none;">Nenhum registro ainda.</p>
+        </section>
+
+        <!-- TAB VAGAS -->
+        <section class="card tab-content" id="tab-vagas" style="display:none;">
+            <h2><i class="fas fa-square-parking"></i> Status das Vagas</h2>
+            <div class="vagas-grid" id="lista-vagas"></div>
+        </section>
+
+        <!-- TAB VEÍCULOS -->
+        <section class="card tab-content" id="tab-veiculos" style="display:none;">
+            <h2><i class="fas fa-car-side"></i> Cadastrar Veículo</h2>
+            <form id="form-veiculo">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Placa *</label>
+                        <input type="text" id="placa-veiculo" maxlength="8" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" id="marca" placeholder="Volkswagen">
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" id="modelo" placeholder="Gol">
+                    </div>
+                    <div class="form-group">
+                        <label>Cor</label>
+                        <input type="text" id="cor" placeholder="Preto">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="tipo-veiculo">
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                            <option value="caminhao">Caminhão</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ano</label>
+                        <input type="number" id="ano" placeholder="2020">
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanho</label>
+                        <select id="tamanho">
+                            <option value="pequeno">Pequeno</option>
+                            <option value="medio">Médio</option>
+                            <option value="grande">Grande</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Cadastrar Veículo</button>
+            </form>
+
+            <h3 style="margin-top:30px;">Veículos Cadastrados</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Marca/Modelo</th>
+                            <th>Cor</th>
+                            <th>Tipo</th>
+                            <th>Ano</th>
+                            <th>Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-veiculos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB CLIENTES -->
+        <section class="card tab-content" id="tab-clientes" style="display:none;">
+            <h2><i class="fas fa-users"></i> Cadastrar Cliente</h2>
+            <form id="form-cliente">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="nome-cliente" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="telefone" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="email@email.com">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Cadastrar Cliente</button>
+            </form>
+
+            <h3 style="margin-top:30px;">Clientes Cadastrados</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
+                            <th>Data Cadastro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-clientes"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="script.js"></script>
+</body>
+</html>
